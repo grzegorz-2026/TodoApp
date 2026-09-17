@@ -12,7 +12,18 @@ form.addEventListener("submit", function (event) {
 	}
 
 	const taskItem = document.createElement("li");
-	taskItem.textContent = taskText;
+	const taskLabel = document.createElement("label");
+	const taskCheckbox = document.createElement("input");
+
+	taskCheckbox.type = "checkbox";
+	taskLabel.appendChild(taskCheckbox);
+	taskLabel.appendChild(document.createTextNode(taskText));
+	taskItem.appendChild(taskLabel);
+
+	taskCheckbox.addEventListener("change", function () {
+		taskItem.classList.toggle("completed", taskCheckbox.checked);
+	});
+
 	taskList.appendChild(taskItem);
 
 	taskInput.value = "";

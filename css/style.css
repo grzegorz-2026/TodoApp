@@ -74,6 +74,25 @@ button:hover {
 	border-radius: 4px;
 }
 
+#task-list label {
+	grid-column: auto;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-weight: normal;
+	cursor: pointer;
+}
+
+#task-list input {
+	width: auto;
+}
+
+#task-list li.completed {
+	background-color: #e8eef2;
+	color: #718096;
+	text-decoration: line-through;
+}
+
 @media (max-width: 600px) {
 	body {
 		padding: 28px 16px;
