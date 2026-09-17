@@ -1,12 +1,9 @@
+import { loadTasks, saveTasks } from "./storage.js";
+
 const form = document.querySelector("form");
 const taskInput = document.querySelector("#new-task");
 const taskList = document.querySelector("#task-list");
-const savedTasks = localStorage.getItem("tasks");
-let tasks = savedTasks ? JSON.parse(savedTasks) : [];
-
-function saveTasks() {
-	localStorage.setItem("tasks", JSON.stringify(tasks));
-}
+let tasks = loadTasks();
 
 function renderTask(task) {
 	const taskItem = document.createElement("li");
@@ -30,7 +27,7 @@ function renderTask(task) {
 	taskCheckbox.addEventListener("change", function () {
 		task.completed = taskCheckbox.checked;
 		taskItem.classList.toggle("completed", task.completed);
-		saveTasks();
+		saveTasks(tasks);
 	});
 
 	deleteButton.addEventListener("click", function () {
@@ -38,7 +35,7 @@ function renderTask(task) {
 			return currentTask !== task;
 		});
 		taskItem.remove();
-		saveTasks();
+		saveTasks(tasks);
 	});
 
 	taskList.appendChild(taskItem);
@@ -62,7 +59,7 @@ form.addEventListener("submit", function (event) {
 
 	tasks.push(newTask);
 	renderTask(newTask);
-	saveTasks();
+	saveTasks(tasks);
 
 	taskInput.value = "";
 });
