@@ -67,6 +67,10 @@ button:hover {
 }
 
 #task-list li {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
 	margin-bottom: 10px;
 	padding: 14px 16px;
 	background-color: #ffffff;
@@ -76,6 +80,7 @@ button:hover {
 
 #task-list label {
 	grid-column: auto;
+	flex: 1;
 	display: flex;
 	align-items: center;
 	gap: 10px;
@@ -90,7 +95,19 @@ button:hover {
 #task-list li.completed {
 	background-color: #e8eef2;
 	color: #718096;
+}
+
+#task-list li.completed label {
 	text-decoration: line-through;
+}
+
+#task-list .delete-button {
+	padding: 8px 12px;
+	background-color: #c44536;
+}
+
+#task-list .delete-button:hover {
+	background-color: #a83225;
 }
 
 @media (max-width: 600px) {
@@ -105,5 +122,9 @@ button:hover {
 
 	button {
 		width: 100%;
+	}
+
+	#task-list .delete-button {
+		width: auto;
 	}
 }
