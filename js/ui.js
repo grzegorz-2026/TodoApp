@@ -89,3 +89,8 @@ export function renderTasks(tasks, callbacks) {
 		renderTask(task, callbacks);
 	});
 }
+
+export function renderTodoCount(count) {
+	const todoCount = document.querySelector("#todo-count");
+	todoCount.textContent = `Do zrobienia: ${count}`;
+}

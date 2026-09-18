@@ -1,6 +1,6 @@
 import { loadTasks, saveTasks } from "./storage.js";
-import { addTask, toggleTask, removeTask, editTask, filterTasks } from "./tasks.js";
-import { renderTasks } from "./ui.js";
+import { addTask, toggleTask, removeTask, editTask, filterTasks, countTodo } from "./tasks.js";
+import { renderTasks, renderTodoCount } from "./ui.js";
 
 const form = document.querySelector("form");
 const taskInput = document.querySelector("#new-task");
@@ -10,6 +10,7 @@ let currentFilter = "all";
 
 function renderCurrentTasks() {
 	const visibleTasks = filterTasks(tasks, currentFilter);
+	renderTodoCount(countTodo(tasks));
 	renderTasks(visibleTasks, taskCallbacks);
 }
 
