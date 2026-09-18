@@ -54,3 +54,9 @@ export function filterTasks(tasks, filter) {
 
 	return [...tasks];
 }
+
+export function countTodo(tasks) {
+	return tasks.filter(function (task) {
+		return task.completed === false;
+	}).length;
+}

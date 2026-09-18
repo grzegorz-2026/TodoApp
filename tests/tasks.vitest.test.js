@@ -1,6 +1,7 @@
-import { expect, test } from "vitest";
-import { addTask, toggleTask, removeTask, filterTasks, editTask } from "../js/tasks.js";
+import { describe, expect, test } from "vitest";
+import { addTask, toggleTask, removeTask, filterTasks, editTask, countTodo } from "../js/tasks.js";
 
+describe("addTask", function () {
 test("addTask dodaje zadanie", function () {
 	const tasks = [];
 	const result = addTask(tasks, "Kupić mleko");
@@ -33,7 +34,9 @@ test("addTask nie modyfikuje oryginalnej tablicy", function () {
 
 	expect(tasks).toHaveLength(0);
 });
+});
 
+describe("toggleTask", function () {
 test("toggleTask zmienia completed z false na true", function () {
 	const task = { text: "Kupić mleko", completed: false };
 	const result = toggleTask([task], task);
@@ -83,7 +86,9 @@ test("toggleTask nie modyfikuje oryginalnych danych", function () {
 	expect(JSON.stringify(tasks)).toBe(originalTasks);
 	expect(JSON.stringify(task)).toBe(originalTask);
 });
+});
 
+describe("removeTask", function () {
 test("removeTask usuwa wskazane zadanie", function () {
 	const firstTask = { text: "Kupić mleko", completed: false };
 	const secondTask = { text: "Napisać raport", completed: false };
@@ -132,7 +137,9 @@ test("removeTask nie modyfikuje oryginalnej tablicy", function () {
 	expect(tasks[0]).toBe(firstTask);
 	expect(tasks[1]).toBe(secondTask);
 });
+});
 
+describe("filterTasks", function () {
 test("filterTasks z filtrem all zwraca wszystkie zadania", function () {
 	const tasks = [
 		{ text: "Niewykonane", completed: false },
@@ -186,7 +193,9 @@ test("filterTasks nie modyfikuje oryginalnej tablicy", function () {
 
 	expect(JSON.stringify(tasks)).toBe(originalTasks);
 });
+});
 
+describe("editTask", function () {
 test("editTask zmienia tekst wskazanego zadania", function () {
 	const task = { text: "Kupić mleko", completed: false };
 	const result = editTask([task], task, "Kupić chleb");
@@ -249,4 +258,17 @@ test("editTask nie modyfikuje oryginalnego obiektu zadania", function () {
 	editTask([task], task, "Kupić chleb");
 
 	expect(JSON.stringify(task)).toBe(originalTask);
+});
+});
+
+describe("countTodo", function () {
+test("countTodo zwraca liczbę niewykonanych zadań", function () {
+	const tasks = [
+		{ text: "Kupić mleko", completed: false },
+		{ text: "Napisać raport", completed: false },
+		{ text: "Zrobić zakupy", completed: true }
+	];
+
+	expect(countTodo(tasks)).toBe(2);
+});
 });
