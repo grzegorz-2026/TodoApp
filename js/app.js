@@ -1,4 +1,5 @@
 import { loadTasks, saveTasks } from "./storage.js";
+import { addTask, toggleTask, removeTask } from "./tasks.js";
 
 const form = document.querySelector("form");
 const taskInput = document.querySelector("#new-task");
@@ -25,15 +26,15 @@ function renderTask(task) {
 	taskItem.classList.toggle("completed", task.completed);
 
 	taskCheckbox.addEventListener("change", function () {
-		task.completed = taskCheckbox.checked;
+		const taskIndex = tasks.indexOf(task);
+		tasks = toggleTask(tasks, task);
+		task = tasks[taskIndex];
 		taskItem.classList.toggle("completed", task.completed);
 		saveTasks(tasks);
 	});
 
 	deleteButton.addEventListener("click", function () {
-		tasks = tasks.filter(function (currentTask) {
-			return currentTask !== task;
-		});
+		tasks = removeTask(tasks, task);
 		taskItem.remove();
 		saveTasks(tasks);
 	});
@@ -52,13 +53,8 @@ form.addEventListener("submit", function (event) {
 		return;
 	}
 
-	const newTask = {
-		text: taskText,
-		completed: false
-	};
-
-	tasks.push(newTask);
-	renderTask(newTask);
+	tasks = addTask(tasks, taskText);
+	renderTask(tasks[tasks.length - 1]);
 	saveTasks(tasks);
 
 	taskInput.value = "";
