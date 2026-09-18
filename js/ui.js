@@ -29,3 +29,12 @@ export function renderTask(task, callbacks) {
 
 	document.querySelector("#task-list").appendChild(taskItem);
 }
+
+export function renderTasks(tasks, callbacks) {
+	const taskList = document.querySelector("#task-list");
+	taskList.innerHTML = "";
+
+	tasks.forEach(function (task) {
+		renderTask(task, callbacks);
+	});
+}

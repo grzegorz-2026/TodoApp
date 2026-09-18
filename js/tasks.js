@@ -25,3 +25,19 @@ export function removeTask(tasks, task) {
 		return currentTask !== task;
 	});
 }
+
+export function filterTasks(tasks, filter) {
+	if (filter === "todo") {
+		return tasks.filter(function (task) {
+			return !task.completed;
+		});
+	}
+
+	if (filter === "completed") {
+		return tasks.filter(function (task) {
+			return task.completed;
+		});
+	}
+
+	return [...tasks];
+}

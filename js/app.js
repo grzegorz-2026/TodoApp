@@ -1,21 +1,30 @@
 import { loadTasks, saveTasks } from "./storage.js";
-import { addTask, toggleTask, removeTask } from "./tasks.js";
-import { renderTask } from "./ui.js";
+import { addTask, toggleTask, removeTask, filterTasks } from "./tasks.js";
+import { renderTasks } from "./ui.js";
 
 const form = document.querySelector("form");
 const taskInput = document.querySelector("#new-task");
+const filterButtons = document.querySelectorAll("[data-filter]");
 let tasks = loadTasks();
+let currentFilter = "all";
+
+function renderCurrentTasks() {
+	const visibleTasks = filterTasks(tasks, currentFilter);
+	renderTasks(visibleTasks, taskCallbacks);
+}
 
 function handleToggle(task) {
 	const taskIndex = tasks.indexOf(task);
 	tasks = toggleTask(tasks, task);
 	saveTasks(tasks);
+	renderCurrentTasks();
 	return tasks[taskIndex];
 }
 
 function handleDelete(task) {
 	tasks = removeTask(tasks, task);
 	saveTasks(tasks);
+	renderCurrentTasks();
 }
 
 const taskCallbacks = {
@@ -23,9 +32,14 @@ const taskCallbacks = {
 	onDelete: handleDelete
 };
 
-tasks.forEach(function (task) {
-	renderTask(task, taskCallbacks);
+filterButtons.forEach(function (button) {
+	button.addEventListener("click", function () {
+		currentFilter = button.dataset.filter;
+		renderCurrentTasks();
+	});
 });
+
+renderCurrentTasks();
 
 form.addEventListener("submit", function (event) {
 	event.preventDefault();
@@ -37,8 +51,8 @@ form.addEventListener("submit", function (event) {
 	}
 
 	tasks = addTask(tasks, taskText);
-	renderTask(tasks[tasks.length - 1], taskCallbacks);
 	saveTasks(tasks);
+	renderCurrentTasks();
 
 	taskInput.value = "";
 });
