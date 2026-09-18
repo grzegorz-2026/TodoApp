@@ -1,4 +1,4 @@
-import { addTask, toggleTask, removeTask, filterTasks } from "../js/tasks.js";
+import { addTask, toggleTask, removeTask, filterTasks, editTask } from "../js/tasks.js";
 
 const results = document.querySelector("#results");
 const summary = document.querySelector("#summary");
@@ -201,6 +201,69 @@ test("filterTasks nie modyfikuje oryginalnej tablicy", function () {
 	filterTasks(tasks, "completed");
 
 	return JSON.stringify(tasks) === originalTasks;
+});
+
+test("editTask zmienia tekst wskazanego zadania", function () {
+	const task = { text: "Kupić mleko", completed: false };
+	const result = editTask([task], task, "Kupić chleb");
+
+	return result[0].text === "Kupić chleb";
+});
+
+test("editTask nie zmienia tekstu pozostałych zadań", function () {
+	const firstTask = { text: "Kupić mleko", completed: false };
+	const secondTask = { text: "Napisać raport", completed: false };
+	const result = editTask([firstTask, secondTask], firstTask, "Kupić chleb");
+
+	return result[1].text === "Napisać raport";
+});
+
+test("editTask zachowuje completed edytowanego zadania", function () {
+	const task = { text: "Kupić mleko", completed: false };
+	const result = editTask([task], task, "Kupić chleb");
+
+	return result[0].completed === false;
+});
+
+test("editTask działa dla wykonanego zadania", function () {
+	const task = { text: "Kupić mleko", completed: true };
+	const result = editTask([task], task, "Kupić chleb");
+
+	return result[0].text === "Kupić chleb" && result[0].completed === true;
+});
+
+test("editTask zwraca nową tablicę", function () {
+	const task = { text: "Kupić mleko", completed: false };
+	const tasks = [task];
+	const result = editTask(tasks, task, "Kupić chleb");
+
+	return result !== tasks;
+});
+
+test("editTask tworzy nowy obiekt edytowanego zadania", function () {
+	const task = { text: "Kupić mleko", completed: false };
+	const result = editTask([task], task, "Kupić chleb");
+
+	return result[0] !== task;
+});
+
+test("editTask nie modyfikuje oryginalnej tablicy", function () {
+	const task = { text: "Kupić mleko", completed: false };
+	const tasks = [task];
+	const originalTasks = JSON.stringify(tasks);
+
+	editTask(tasks, task, "Kupić chleb");
+
+	return JSON.stringify(tasks) === originalTasks;
+});
+
+test("editTask nie modyfikuje oryginalnego obiektu zadania", function () {
+	const task = { text: "Kupić mleko", completed: false };
+	const originalTask = JSON.stringify(task);
+
+	editTask([task], task, "Kupić chleb");
+
+	return JSON.stringify(task) === originalTask;
 });
 
 summary.textContent = `PASS: ${passCount} | FAIL: ${failCount}`;
