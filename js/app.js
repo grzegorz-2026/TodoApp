@@ -1,11 +1,18 @@
 import { loadTasks, saveTasks } from "./storage.js";
-import { addTask, toggleTask, removeTask, editTask, filterTasks, countTodo } from "./tasks.js";
+import { removeTask, filterTasks, countTodo } from "./tasks.js";
 import { renderTasks, renderTodoCount } from "./ui.js";
+import {
+	fetchTasks,
+	insertTask,
+	updateTaskCompleted,
+	updateTaskText,
+	deleteTask
+} from "./supabase.js";
 
 const form = document.querySelector("form");
 const taskInput = document.querySelector("#new-task");
 const filterButtons = document.querySelectorAll("[data-filter]");
-let tasks = loadTasks();
+let tasks = [];
 let currentFilter = "all";
 
 function renderCurrentTasks() {
@@ -15,25 +22,52 @@ function renderCurrentTasks() {
 }
 
 function handleToggle(task) {
-	const taskIndex = tasks.indexOf(task);
-	tasks = toggleTask(tasks, task);
-	saveTasks(tasks);
-	renderCurrentTasks();
-	return tasks[taskIndex];
+	updateTaskCompleted(task.id, !task.completed)
+		.then(function (updatedTask) {
+			tasks = tasks.map(function (currentTask) {
+				return currentTask.id === updatedTask.id ? updatedTask : currentTask;
+			});
+			saveTasks(tasks);
+			renderCurrentTasks();
+		})
+		.catch(function (error) {
+			console.error("Nie udało się zaktualizować statusu zadania w Supabase:", error);
+			renderCurrentTasks();
+		});
+
+	return task;
 }
 
 function handleDelete(task) {
-	tasks = removeTask(tasks, task);
-	saveTasks(tasks);
-	renderCurrentTasks();
+	deleteTask(task.id)
+		.then(function (deletedTask) {
+			tasks = tasks.filter(function (currentTask) {
+				return currentTask.id !== deletedTask.id;
+			});
+			saveTasks(tasks);
+			renderCurrentTasks();
+		})
+		.catch(function (error) {
+			console.error("Nie udało się usunąć zadania z Supabase:", error);
+			renderCurrentTasks();
+		});
 }
 
 function handleEdit(task, newText) {
-	const taskIndex = tasks.indexOf(task);
-	tasks = editTask(tasks, task, newText);
-	saveTasks(tasks);
-	renderCurrentTasks();
-	return tasks[taskIndex];
+	updateTaskText(task.id, newText)
+		.then(function (updatedTask) {
+			tasks = tasks.map(function (currentTask) {
+				return currentTask.id === updatedTask.id ? updatedTask : currentTask;
+			});
+			saveTasks(tasks);
+			renderCurrentTasks();
+		})
+		.catch(function (error) {
+			console.error("Nie udało się zaktualizować tekstu zadania w Supabase:", error);
+			renderCurrentTasks();
+		});
+
+	return task;
 }
 
 const taskCallbacks = {
@@ -49,9 +83,20 @@ filterButtons.forEach(function (button) {
 	});
 });
 
-renderCurrentTasks();
+async function initializeTasks() {
+	try {
+		tasks = await fetchTasks();
+	} catch (error) {
+		console.error("Nie udało się pobrać zadań z Supabase:", error);
+		tasks = loadTasks();
+	}
 
-form.addEventListener("submit", function (event) {
+	renderCurrentTasks();
+}
+
+initializeTasks();
+
+form.addEventListener("submit", async function (event) {
 	event.preventDefault();
 
 	const taskText = taskInput.value.trim();
@@ -60,9 +105,13 @@ form.addEventListener("submit", function (event) {
 		return;
 	}
 
-	tasks = addTask(tasks, taskText);
-	saveTasks(tasks);
-	renderCurrentTasks();
-
-	taskInput.value = "";
+	try {
+		const createdTask = await insertTask(taskText);
+		tasks = [...tasks, createdTask];
+		saveTasks(tasks);
+		renderCurrentTasks();
+		taskInput.value = "";
+	} catch (error) {
+		console.error("Nie udało się zapisać zadania w Supabase:", error);
+	}
 });
