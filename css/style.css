@@ -127,6 +127,42 @@ button:hover {
 	background-color: #a83225;
 }
 
+#task-list .edit-button {
+	padding: 8px 12px;
+	background-color: #457b9d;
+}
+
+#task-list .edit-button:hover {
+	background-color: #35627e;
+}
+
+#task-list .editing {
+	flex-wrap: wrap;
+}
+
+#task-list .edit-input {
+	flex: 1 1 100%;
+	width: 100%;
+}
+
+#task-list .save-button {
+	padding: 8px 12px;
+	background-color: #3a8d5d;
+}
+
+#task-list .save-button:hover {
+	background-color: #2d7049;
+}
+
+#task-list .cancel-button {
+	padding: 8px 12px;
+	background-color: #718096;
+}
+
+#task-list .cancel-button:hover {
+	background-color: #596a7e;
+}
+
 @media (max-width: 600px) {
 	body {
 		padding: 28px 16px;
@@ -146,6 +182,12 @@ button:hover {
 	}
 
 	#task-list .delete-button {
+		width: auto;
+	}
+
+	#task-list .edit-button,
+	#task-list .save-button,
+	#task-list .cancel-button {
 		width: auto;
 	}
 }

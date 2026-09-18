@@ -1,5 +1,5 @@
 import { loadTasks, saveTasks } from "./storage.js";
-import { addTask, toggleTask, removeTask, filterTasks } from "./tasks.js";
+import { addTask, toggleTask, removeTask, editTask, filterTasks } from "./tasks.js";
 import { renderTasks } from "./ui.js";
 
 const form = document.querySelector("form");
@@ -27,9 +27,18 @@ function handleDelete(task) {
 	renderCurrentTasks();
 }
 
+function handleEdit(task, newText) {
+	const taskIndex = tasks.indexOf(task);
+	tasks = editTask(tasks, task, newText);
+	saveTasks(tasks);
+	renderCurrentTasks();
+	return tasks[taskIndex];
+}
+
 const taskCallbacks = {
 	onToggle: handleToggle,
-	onDelete: handleDelete
+	onDelete: handleDelete,
+	onEdit: handleEdit
 };
 
 filterButtons.forEach(function (button) {

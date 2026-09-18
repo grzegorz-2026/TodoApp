@@ -1,31 +1,82 @@
 export function renderTask(task, callbacks) {
 	const taskItem = document.createElement("li");
-	const taskLabel = document.createElement("label");
-	const taskCheckbox = document.createElement("input");
-	const deleteButton = document.createElement("button");
+	function showTaskView() {
+		const taskLabel = document.createElement("label");
+		const taskCheckbox = document.createElement("input");
+		const editButton = document.createElement("button");
+		const deleteButton = document.createElement("button");
 
-	taskCheckbox.type = "checkbox";
-	taskCheckbox.checked = task.completed;
-	taskLabel.appendChild(taskCheckbox);
-	taskLabel.appendChild(document.createTextNode(task.text));
-	taskItem.appendChild(taskLabel);
+		taskItem.innerHTML = "";
+		taskItem.classList.remove("editing");
+		taskCheckbox.type = "checkbox";
+		taskCheckbox.checked = task.completed;
+		taskLabel.appendChild(taskCheckbox);
+		taskLabel.appendChild(document.createTextNode(task.text));
+		taskItem.appendChild(taskLabel);
 
-	deleteButton.type = "button";
-	deleteButton.textContent = "Usuń";
-	deleteButton.className = "delete-button";
-	taskItem.appendChild(deleteButton);
+		editButton.type = "button";
+		editButton.textContent = "Edytuj";
+		editButton.className = "edit-button";
+		taskItem.appendChild(editButton);
 
-	taskItem.classList.toggle("completed", task.completed);
+		deleteButton.type = "button";
+		deleteButton.textContent = "Usuń";
+		deleteButton.className = "delete-button";
+		taskItem.appendChild(deleteButton);
 
-	taskCheckbox.addEventListener("change", function () {
-		task = callbacks.onToggle(task);
 		taskItem.classList.toggle("completed", task.completed);
-	});
 
-	deleteButton.addEventListener("click", function () {
-		callbacks.onDelete(task);
-		taskItem.remove();
-	});
+		taskCheckbox.addEventListener("change", function () {
+			task = callbacks.onToggle(task);
+			taskItem.classList.toggle("completed", task.completed);
+		});
+
+		editButton.addEventListener("click", showEditView);
+
+		deleteButton.addEventListener("click", function () {
+			callbacks.onDelete(task);
+			taskItem.remove();
+		});
+	}
+
+	function showEditView() {
+		const editInput = document.createElement("input");
+		const saveButton = document.createElement("button");
+		const cancelButton = document.createElement("button");
+
+		taskItem.innerHTML = "";
+		taskItem.classList.add("editing");
+		editInput.type = "text";
+		editInput.value = task.text;
+		editInput.className = "edit-input";
+		taskItem.appendChild(editInput);
+
+		saveButton.type = "button";
+		saveButton.textContent = "Zapisz";
+		saveButton.className = "save-button";
+		taskItem.appendChild(saveButton);
+
+		cancelButton.type = "button";
+		cancelButton.textContent = "Anuluj";
+		cancelButton.className = "cancel-button";
+		taskItem.appendChild(cancelButton);
+
+		saveButton.addEventListener("click", function () {
+			const newText = editInput.value.trim();
+
+			if (newText === "") {
+				editInput.focus();
+				return;
+			}
+
+			task = callbacks.onEdit(task, newText);
+		});
+
+		cancelButton.addEventListener("click", showTaskView);
+		editInput.focus();
+	}
+
+	showTaskView();
 
 	document.querySelector("#task-list").appendChild(taskItem);
 }

@@ -26,6 +26,19 @@ export function removeTask(tasks, task) {
 	});
 }
 
+export function editTask(tasks, task, newText) {
+	return tasks.map(function (currentTask) {
+		if (currentTask === task) {
+			return {
+				...currentTask,
+				text: newText
+			};
+		}
+
+		return currentTask;
+	});
+}
+
 export function filterTasks(tasks, filter) {
 	if (filter === "todo") {
 		return tasks.filter(function (task) {
