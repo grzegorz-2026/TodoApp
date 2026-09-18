@@ -1,0 +1,27 @@
+{
+  "name": "todoapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "vitest run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/grzegorz-2026/TodoApp.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/grzegorz-2026/TodoApp/issues"
+  },
+  "homepage": "https://github.com/grzegorz-2026/TodoApp#readme",
+  "devDependencies": {
+    "vitest": "^5.0.1"
+  }
+}
