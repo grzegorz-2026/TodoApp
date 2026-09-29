@@ -1,4 +1,3 @@
-import { saveTasks } from "./storage.js";
 import { removeTask, filterTasks, countTodo } from "./tasks.js";
 import { renderTasks, renderTodoCount } from "./ui.js";
 import {
@@ -45,7 +44,6 @@ function handleToggle(task) {
 			tasks = tasks.map(function (currentTask) {
 				return currentTask.id === updatedTask.id ? updatedTask : currentTask;
 			});
-			saveTasks(tasks);
 			renderCurrentTasks();
 		})
 		.catch(function (error) {
@@ -62,7 +60,6 @@ function handleDelete(task) {
 			tasks = tasks.filter(function (currentTask) {
 				return currentTask.id !== deletedTask.id;
 			});
-			saveTasks(tasks);
 			renderCurrentTasks();
 		})
 		.catch(function (error) {
@@ -77,7 +74,6 @@ function handleEdit(task, newText) {
 			tasks = tasks.map(function (currentTask) {
 				return currentTask.id === updatedTask.id ? updatedTask : currentTask;
 			});
-			saveTasks(tasks);
 			renderCurrentTasks();
 		})
 		.catch(function (error) {
@@ -182,7 +178,6 @@ form.addEventListener("submit", async function (event) {
 	try {
 		const createdTask = await insertTask(taskText);
 		tasks = [...tasks, createdTask];
-		saveTasks(tasks);
 		renderCurrentTasks();
 		taskInput.value = "";
 	} catch (error) {
