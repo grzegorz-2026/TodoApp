@@ -2,6 +2,8 @@ import { removeTask, filterTasks, countTodo } from "./tasks.js";
 import { renderTasks, renderTodoCount } from "./ui.js";
 import {
 	signIn,
+	signUp,
+	processSignupCallback,
 	saveSession,
 	getValidSession,
 	signOut,
@@ -18,6 +20,10 @@ const loginSection = document.querySelector("#login-section");
 const loginEmail = document.querySelector("#login-email");
 const loginPassword = document.querySelector("#login-password");
 const loginError = document.querySelector("#login-error");
+const signupForm = document.querySelector("#signup-form");
+const signupEmail = document.querySelector("#signup-email");
+const signupPassword = document.querySelector("#signup-password");
+const signupStatus = document.querySelector("#signup-status");
 const todoSection = document.querySelector("#todo-section");
 const logoutButton = document.querySelector("#logout-button");
 const form = document.querySelector("#task-form");
@@ -130,7 +136,21 @@ async function initializeTasks() {
 	renderCurrentTasks();
 }
 
-initializeTasks();
+async function initializeApp() {
+	try {
+		const session = await processSignupCallback();
+
+		if (session) {
+			saveSession(session);
+		}
+	} catch (error) {
+		signupStatus.textContent = "Nie udało się dokończyć potwierdzenia e-maila. Spróbuj zalogować się ręcznie.";
+	}
+
+	await initializeTasks();
+}
+
+initializeApp();
 
 loginForm.addEventListener("submit", async function (event) {
 	event.preventDefault();
@@ -146,6 +166,38 @@ loginForm.addEventListener("submit", async function (event) {
 		loginPassword.value = "";
 	} catch (error) {
 		loginError.textContent = error.message;
+	}
+});
+
+signupForm.addEventListener("submit", async function (event) {
+	event.preventDefault();
+	signupStatus.textContent = "";
+
+	const email = signupEmail.value;
+	const password = signupPassword.value;
+
+	try {
+		const signupResponse = await signUp(email, password);
+		const hasActiveSession = Boolean(
+			signupResponse &&
+			signupResponse.access_token &&
+			signupResponse.refresh_token
+		);
+
+		if (!hasActiveSession) {
+			signupStatus.textContent = "Konto zostało utworzone. Sprawdź pocztę i potwierdź adres e-mail, a następnie zaloguj się.";
+			return;
+		}
+
+		saveSession(signupResponse);
+		updateAuthUI(true);
+		tasks = await fetchTasks();
+		renderCurrentTasks();
+		signupForm.reset();
+	} catch (error) {
+		signupStatus.textContent = error instanceof Error
+			? error.message
+			: "Nie udało się utworzyć konta. Spróbuj ponownie.";
 	}
 });
 

@@ -38,6 +38,42 @@ export async function signIn(email, password) {
 	return response.json();
 }
 
+export async function signUp(email, password) {
+	const response = await fetch(
+		`${SUPABASE_URL}/auth/v1/signup`,
+		{
+			method: "POST",
+			headers: {
+				apikey: SUPABASE_PUBLISHABLE_KEY,
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({
+				email: email,
+				password: password
+			})
+		}
+	);
+
+	if (!response.ok) {
+		let errorMessage = `Supabase zwrócił HTTP ${response.status}`;
+
+		try {
+			const errorBody = await response.json();
+			errorMessage =
+				errorBody.error_description ||
+				errorBody.msg ||
+				errorBody.message ||
+				errorMessage;
+		} catch (error) {
+			// Zachowaj komunikat HTTP, gdy odpowiedź nie zawiera JSON.
+		}
+
+		throw new Error(errorMessage);
+	}
+
+	return response.json();
+}
+
 export function saveSession(session) {
 	localStorage.setItem(AUTH_SESSION_STORAGE_KEY, JSON.stringify(session));
 }
@@ -98,6 +134,39 @@ export async function refreshSession(refreshToken) {
 	}
 
 	return response.json();
+}
+
+export async function processSignupCallback() {
+	const hashParams = new URLSearchParams(window.location.hash.slice(1));
+
+	if (hashParams.get("type") !== "signup") {
+		return null;
+	}
+
+	const refreshToken = hashParams.get("refresh_token");
+	window.history.replaceState(
+		null,
+		document.title,
+		window.location.pathname + window.location.search
+	);
+
+	if (!refreshToken) {
+		throw new Error("Brak tokenu odświeżania w odpowiedzi potwierdzenia rejestracji.");
+	}
+
+	const session = await refreshSession(refreshToken);
+
+	if (
+		!session ||
+		!session.access_token ||
+		!session.refresh_token ||
+		!session.user ||
+		!session.user.id
+	) {
+		throw new Error("Supabase zwrócił niepełną sesję po potwierdzeniu rejestracji.");
+	}
+
+	return session;
 }
 
 export async function getValidSession() {
