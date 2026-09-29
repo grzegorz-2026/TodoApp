@@ -15,15 +15,23 @@ import {
 } from "./supabase.js";
 
 const loginForm = document.querySelector("#login-form");
+const loginSection = document.querySelector("#login-section");
 const loginEmail = document.querySelector("#login-email");
 const loginPassword = document.querySelector("#login-password");
 const loginError = document.querySelector("#login-error");
+const todoSection = document.querySelector("#todo-section");
 const logoutButton = document.querySelector("#logout-button");
 const form = document.querySelector("#task-form");
 const taskInput = document.querySelector("#new-task");
 const filterButtons = document.querySelectorAll("[data-filter]");
 let tasks = [];
 let currentFilter = "all";
+
+function updateAuthUI(isAuthenticated) {
+	loginSection.hidden = isAuthenticated;
+	todoSection.hidden = !isAuthenticated;
+	logoutButton.hidden = !isAuthenticated;
+}
 
 function renderCurrentTasks() {
 	const visibleTasks = filterTasks(tasks, currentFilter);
@@ -94,14 +102,27 @@ filterButtons.forEach(function (button) {
 });
 
 async function initializeTasks() {
+	let session;
+
 	try {
-		const session = await getValidSession();
+		session = await getValidSession();
+	} catch (error) {
+		updateAuthUI(false);
+		tasks = [];
+		renderCurrentTasks();
+		console.error("Nie udało się zainicjalizować sesji lub pobrać zadań:", error.message);
+		return;
+	}
 
-		if (!session) {
-			tasks = [];
-			return;
-		}
+	if (!session) {
+		updateAuthUI(false);
+		tasks = [];
+		return;
+	}
 
+	updateAuthUI(true);
+
+	try {
 		tasks = await fetchTasks();
 	} catch (error) {
 		tasks = [];
@@ -122,6 +143,7 @@ loginForm.addEventListener("submit", async function (event) {
 	try {
 		const session = await signIn(loginEmail.value, loginPassword.value);
 		saveSession(session);
+		updateAuthUI(true);
 		console.log("Zalogowano użytkownika", session.user.id);
 		tasks = await fetchTasks();
 		renderCurrentTasks();
@@ -144,6 +166,7 @@ logoutButton.addEventListener("click", async function () {
 		clearSession();
 		tasks = [];
 		renderCurrentTasks();
+		updateAuthUI(false);
 	}
 });
 
